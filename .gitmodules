@@ -1,0 +1,3 @@
+[submodule "auxLearn"]
+	path = auxLearn
+	url = https://github.com/nokhbeh100/auxLearn.git
