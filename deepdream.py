@@ -124,8 +124,7 @@ referenceModel.load_state_dict(state_dict)
 conceptModel = SingleSigmoidFeatureClassifier()
 conceptModel.load_state_dict(torch.load(conceptName))
 
-L1 = getModules(referenceModel)[:-2]
-model = nn.Sequential(nn.Sequential(*L1), conceptModel)
+model = nn.Sequential(nn.Sequential(*getModules(referenceModel)[:-2]), conceptModel)
 
 image = np.array(np.random.normal(0.5, .2, (256, 256, 3)), dtype='float')
 

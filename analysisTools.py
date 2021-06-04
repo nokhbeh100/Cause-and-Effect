@@ -1,12 +1,14 @@
 import torch
 import progressbar
 from auxLearn.auxLearn import CUDA
+from matplotlib import pyplot as plt
+import numpy as np
 
 # this function is to be used as last function of model and concept
 def doNothing(x):
     return x
  
-def crossEvaluateMultiOutput(conceptModel, model, actLoader, modelLastFunc=torch.nn.functional.softmax, conceptLastFunc=doNothing):
+def crossEvaluateMultiOutput(conceptModel, targetModel, actLoader, modelLastFunc=torch.nn.functional.softmax, conceptLastFunc=doNothing):
     #y: which class are we using to calculate the gradient
     evalPoints = []
     if CUDA:
@@ -19,10 +21,9 @@ def crossEvaluateMultiOutput(conceptModel, model, actLoader, modelLastFunc=torch
             acts = acts.cuda()
         conceptModel.eval()
         outputsConcept = conceptModel(acts)
-        model.eval()
-        outputsModel = model(acts)
-        
-        evalPoints.append( (conceptLastFunc(outputsConcept).detach().cpu().numpy(), 
-                            modelLastFunc(outputsModel).detach().cpu().numpy()) )
+        targetModel.eval()
+        outputsModel = targetModel(acts)
+        evalPoints.append( (conceptLastFunc(outputsConcept.reshape((1,-1))).detach().cpu().numpy(), 
+                            modelLastFunc(outputsModel.reshape((1,-1))).detach().cpu().numpy() ) )
     bar.finish()
     return evalPoints

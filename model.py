@@ -3,7 +3,6 @@ from torchvision.models import *
 import torch.nn.functional as F
 from torch import nn
 import numpy as np
-import gc
 from auxLearn.auxLearnVision import CUDA
 
 
