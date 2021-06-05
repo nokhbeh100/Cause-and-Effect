@@ -6,6 +6,8 @@ Created on Sat Nov  9 16:26:37 2019
 @author: mnz
 """
 
+import torchvision
+import torch
 from torch.utils.data import Dataset
 import pandas as pd
 from matplotlib import pyplot as plt
@@ -15,14 +17,13 @@ import numpy as np
 from auxLearn.auxLearnVision import resize
 
 #import matplotlib._png as png
-from cv2 import imread, IMREAD_UNCHANGED
-
+import cv2
 
 
 def readMask(filename):
     #d = png.read_png_int(open(filename,'rb'))
     #d = plt.imread(filename)
-    d = imread(filename, IMREAD_UNCHANGED)
+    d = cv2.cvtColor(cv2.imread(filename, cv2.IMREAD_UNCHANGED), cv2.COLOR_BGR2RGB)
     d = d.astype(np.uint32)
     return d[:,:,0] + 256*d[:,:,1] + 256*256*d[:,:,2]
 
@@ -58,7 +59,7 @@ class conceptDataset(Dataset):
             else:
                 out += np.mean(mask == self.concept_no)
 
-        return image, out
+        return image, torchvision.transforms.ToTensor()(out).to(torch.float32)
     
     def apply_hardNeg(self, errVal):
         self.train_idx = self.test_idx[ np.argsort(errVal)[-self.train_size:] ]

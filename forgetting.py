@@ -103,6 +103,7 @@ conceptValidLayersAcc = []
 conceptValidLayersSen = []
 layers = list( motherNet.children() )
 
+
 for layerNo in [2]:
     
     print (f'inspecting: {-layerNo}')
@@ -110,8 +111,8 @@ for layerNo in [2]:
 
         
     if len(list(layers[-layerNo+1].parameters())) == 0:
-        print('skipping due to nontrainable next layer (maybe activation/dropout/flatten)')
-        continue
+        print('WARNING: next layer is nontrainable (maybe activation/dropout/flatten)')
+        #continue
     
     # reset the network
     motherNetBase.load_state_dict(state_dict)
@@ -134,7 +135,8 @@ for layerNo in [2]:
          ts,
          sampleToBatch,
          toCuda,
-         firstSection])
+         firstSection,
+         batchToSample])
     
     # this is required to get activation of the reference model
     evalSet = torchvision.datasets.ImageFolder(evaluationFolder, loader=plt.imread, transform=transform )
@@ -148,6 +150,8 @@ for layerNo in [2]:
             broden = brodenDataset('./datasets/broden1_224/', transform, resize=(7, 7))                
             conceptTrainLoader = data.DataLoader(broden.get_train_concept(concept_no), num_workers=0)
             conceptValidLoader = data.DataLoader(broden.get_valid_concept(concept_no), num_workers=0)
+            
+            conceptModel = torch.nn.Sequential(torch.nn.Conv2d(512, 1, 1), torch.nn.Sigmoid())
         else:
             conceptTrainLoader, conceptValidLoader, conceptTestLoader = loadDataset(conceptFolder, transform=transform, num_workers=0)
         
@@ -177,6 +181,9 @@ for layerNo in [2]:
         
         
         logFile.flush()
+        
+        if USE_BRODEN:
+            conceptModel = torch.nn.Sequential(*([torch.nn.AdaptiveAvgPool2d(output_size=(1, 1))]+list(conceptModel.children())))
     else:
         conceptModel = SingleSigmoidFeatureClassifier()
         conceptModel.load_state_dict(torch.load(conceptName))
