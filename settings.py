@@ -8,21 +8,24 @@ logFilePath = logFilePath.replace(':','_').replace(' ','.')
 # set to save cocnept model
 savemodels = ''
 
+inspectionLayers = [2] # must be changed to 4 for BRODEN training
+
 TRAIN_MODEL = False
-TRAIN_CONCEPT = False
+TRAIN_CONCEPT = True
 USE_BRODEN = False
 
 # reference model path
-motherName = './models/resnet18_places365.pth.tar'
+motherName = './models/best-mothernet-vgg16-69-71-cropped-seeded.pt'
 # reference comcept model path
-conceptName = './models/14.pth'
+conceptName = ''
 
 # if TRAIN_MODEL is True, set to the folder of training data
 trainFolder = ''
+dataFolder = './datasets/home/nokhbeh1/oai'
 # if TRAIN_CONCEPT is True and USE_BRODEN is False, set to the folder of training concept data
 conceptFolder = ''
 # has to be set if USE_BRODEN and TRAIN_CONCEPT are both True
-concept_no = 0
+concept_no = 154
 
 # folder of evaluation points (distribution sample set)
 evaluationFolder = './datasets/places365/'

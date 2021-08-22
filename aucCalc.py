@@ -57,7 +57,7 @@ def calcAUC(c, t, lineStyle='-', plot=True):
 		#print(x1, y1, thisArea, AUC)
 	return AUC
 
-def plotConceptTarget(c, t, th, ms=4):
+def plotConceptTarget(c, t, th, ms=4, conceptName='Concept', taskName='Task'):
 	plt.plot(c, t, 'x', markersize=ms)
 	plt.plot([th, th], [0, 1], 'r')
 	plt.plot([0, 1], [1-th, 1-th], 'r')
@@ -70,8 +70,8 @@ def plotConceptTarget(c, t, th, ms=4):
 	c4 = sum((c <= th) & (t <= th))
 	plt.text(th/2, (1-th)/2, f'{c4}')
 	
-	plt.xlabel('Concept')
-	plt.ylabel('Task')
+	plt.xlabel(conceptName)
+	plt.ylabel(taskName)
 	
 	print([c1,c2,c3,c4])
 	

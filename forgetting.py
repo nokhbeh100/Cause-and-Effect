@@ -1,6 +1,8 @@
 
-from settings import *
+# cp ~/best-mothernet-vgg16-69-71-cropped-seeded.pt ./models/
 
+from settings import *
+from oai import *
 
 print(logFilePath)
 
@@ -42,15 +44,34 @@ from analysisTools import *
 print ('testing CUDA:', CUDA)
 
 
+transform = transforms.Compose(
+    [gray2rgb,
+     transforms.ToTensor(),
+     lambda image:(image - torch.mean(image))/torch.std(image)])
+
+dataSet = OAI(dataFolder, transform=transform)
+trainSet, testSet, validSet = trainTestValid( dataSet, .7, .2, .1, seed=2021)
+
+trainLoader = torch.utils.data.DataLoader(trainSet, batch_size=16,
+                                         shuffle=False, num_workers=2)
+
+testLoader = torch.utils.data.DataLoader(testSet, batch_size=16,
+                                         shuffle=False, num_workers=2)
+
+validLoader = torch.utils.data.DataLoader(validSet, batch_size=16,
+                                         shuffle=False, num_workers=2)
+
 
 #%%
 
 # both models must be converted to sequential models for better spliting points
-referenceModelBase = torchvision.models.__dict__['resnet18'](num_classes=365)
+#referenceModelBase = torchvision.models.__dict__['resnet18'](num_classes=365)
+referenceModelBase = torchvision.models.vgg16(pretrained=False)
 referenceModel = nn.Sequential( *getModules(referenceModelBase) )
 
 
-motherNetBase = torchvision.models.__dict__['resnet18'](num_classes=365)
+#motherNetBase = torchvision.models.__dict__['resnet18'](num_classes=365)
+motherNetBase = torchvision.models.vgg16(pretrained=False)
 motherNet = nn.Sequential( *getModules(motherNetBase) )
 
 if CUDA:
@@ -58,41 +79,23 @@ if CUDA:
     referenceModel = referenceModel.cuda()
     
 
-criterion = nn.BCELoss()
-
-
-if TRAIN_MODEL:
-    #in case of training is required:
-    transform = transforms.Compose(
-        [transforms.ToTensor(),
-         transforms.Normalize((0.5,)*d, (0.5,)*d)])
-    
-    trainLoader, evalLoader, _ = loadDataset(trainFolder, transform=transform, num_workers=0)
-    
-    optimizer = optim.SGD(motherNet.parameters(), lr=0.001, momentum=0.9)
-    trainForEpoches(motherNet, trainLoader, evalLoader, optimizer, criterion, N_EPOCHS = N_EPOCHS_TRAIN)
-    
-    # save model as the reference
-    torch.save(motherNet.state_dict(), motherName)
+criterion = nn.MSELoss()
 
 
 # if model is pretrained
-checkpoint = torch.load(motherName, map_location='cpu')
-state_dict = {str.replace(k, 'module.', ''): v for k, v in checkpoint['state_dict'].items()}
+#checkpoint = torch.load(motherName, map_location='cpu')
+#state_dict = {str.replace(k, 'module.', ''): v for k, v in checkpoint['state_dict'].items()}
+state_dict = torch.load(motherName)
+
 referenceModelBase.load_state_dict(state_dict)
-motherNet = nn.Sequential( *getModules(motherNetBase) )
-motherNetBase.load_state_dict(state_dict)
 referenceModel = nn.Sequential( *getModules(referenceModelBase) )
 
-
-#%%
-
-
-ts = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                              std=[0.229, 0.224, 0.225])
+motherNetBase.load_state_dict(state_dict)
+motherNet = nn.Sequential( *getModules(motherNetBase) )
 
 
 #%%
+
 
 print('Inspecting layers')
 
@@ -104,7 +107,7 @@ conceptValidLayersSen = []
 layers = list( motherNet.children() )
 
 
-for layerNo in [2]:
+for layerNo in inspectionLayers:
     
     print (f'inspecting: {-layerNo}')
     print(f'getting ready training for the layerNo = {layerNo}')
@@ -131,29 +134,31 @@ for layerNo in [2]:
     transform = transforms.Compose(
         [gray2rgb,
          transforms.ToTensor(),
+         lambda image:(image - torch.mean(image))/torch.std(image),
          #transforms.Normalize((0.5,)*d, (0.5,)*d),
-         ts,
+         #ts,
          sampleToBatch,
          toCuda,
          firstSection,
          batchToSample])
     
+
+    dataSet = OAI(dataFolder, transform=transform)
+    trainSet, testSet, validSet = trainTestValid( dataSet, .7, .2, .1, seed=2021)
+    
+    conceptTrainLoader = torch.utils.data.DataLoader(trainSet, batch_size=16,
+                                             shuffle=False, num_workers=0)
+    
+    conceptValidLoader = torch.utils.data.DataLoader(testSet, batch_size=16,
+                                             shuffle=False, num_workers=0)
     # this is required to get activation of the reference model
-    evalSet = torchvision.datasets.ImageFolder(evaluationFolder, loader=plt.imread, transform=transform )
-    evalLoader = torch.utils.data.DataLoader(evalSet, batch_size=1, shuffle=False, num_workers=0)
+    #evalSet = torchvision.datasets.ImageFolder(evaluationFolder, loader=plt.imread, transform=transform )
+    evalLoader = torch.utils.data.DataLoader(validSet, batch_size=1, shuffle=False, num_workers=0)
 
     
     
 
     if TRAIN_CONCEPT:
-        if USE_BRODEN:
-            broden = brodenDataset('./datasets/broden1_224/', transform, resize=(7, 7))                
-            conceptTrainLoader = data.DataLoader(broden.get_train_concept(concept_no), num_workers=0)
-            conceptValidLoader = data.DataLoader(broden.get_valid_concept(concept_no), num_workers=0)
-            
-            conceptModel = torch.nn.Sequential(torch.nn.Conv2d(512, 1, 1), torch.nn.Sigmoid())
-        else:
-            conceptTrainLoader, conceptValidLoader, conceptTestLoader = loadDataset(conceptFolder, transform=transform, num_workers=0)
         
         #optimizer = optim.SGD(conceptModel.parameters(), lr=0.001, momentum=0.9)
         optimizer = optim.Adam(conceptModel.parameters())
@@ -161,7 +166,7 @@ for layerNo in [2]:
         #train to retrieve information
         print(f'training for the layerNo = {layerNo}')
         logFile.write(f"conceptModel:{conceptModel.__class__.__name__}, layerNo:{layerNo}, optimizer: {optimizer.__class__.__name__}, N_EPOCHS:{N_EPOCHS}, smart_stop:{smart_stop}\n")
-        trainForEpoches(conceptModel, conceptTrainLoader, conceptValidLoader, optimizer, criterion, N_EPOCHS = N_EPOCHS, smart_stop=smart_stop, resultFile=logFile, hardNeg=True)
+        trainForEpoches(conceptModel, conceptTrainLoader, conceptValidLoader, optimizer, criterion, N_EPOCHS = N_EPOCHS, smart_stop=smart_stop, resultFile=logFile, hardNeg=False)
         
         if savemodels:
             torch.save(conceptModel.state_dict(), savemodels+f'concept-{conceptModel.__class__.__name__}-layer{layerNo}.pt')
@@ -182,8 +187,6 @@ for layerNo in [2]:
         
         logFile.flush()
         
-        if USE_BRODEN:
-            conceptModel = torch.nn.Sequential(*([torch.nn.AdaptiveAvgPool2d(output_size=(1, 1))]+list(conceptModel.children())))
     else:
         conceptModel = SingleSigmoidFeatureClassifier()
         conceptModel.load_state_dict(torch.load(conceptName))
