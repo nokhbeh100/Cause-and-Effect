@@ -66,13 +66,13 @@ validLoader = torch.utils.data.DataLoader(validSet, batch_size=16,
 
 # both models must be converted to sequential models for better spliting points
 #referenceModelBase = torchvision.models.__dict__['resnet18'](num_classes=365)
-referenceModelBase = torchvision.models.vgg16(pretrained=False)
-referenceModel = nn.Sequential( *getModules(referenceModelBase) )
+referenceModelBase = singleOutput(torchvision.models.vgg16(pretrained=False))
+referenceModel = nn.Sequential( *getModules(referenceModelBase.model) )
 
 
 #motherNetBase = torchvision.models.__dict__['resnet18'](num_classes=365)
-motherNetBase = torchvision.models.vgg16(pretrained=False)
-motherNet = nn.Sequential( *getModules(motherNetBase) )
+motherNetBase = singleOutput(torchvision.models.vgg16(pretrained=False))
+motherNet = nn.Sequential( *getModules(motherNetBase.model) )
 
 if CUDA:
     motherNet = motherNet.cuda()
@@ -88,10 +88,10 @@ criterion = nn.MSELoss()
 state_dict = torch.load(motherName)
 
 referenceModelBase.load_state_dict(state_dict)
-referenceModel = nn.Sequential( *getModules(referenceModelBase) )
+referenceModel = nn.Sequential( *getModules(referenceModelBase.model) )
 
 motherNetBase.load_state_dict(state_dict)
-motherNet = nn.Sequential( *getModules(motherNetBase) )
+motherNet = nn.Sequential( *getModules(motherNetBase.model) )
 
 
 #%%
