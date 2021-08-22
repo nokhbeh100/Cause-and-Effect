@@ -23,6 +23,16 @@ class SingleSigmoidFeatureClassifier(torch.nn.Module):
         return self.sig(self.fc(input.squeeze()))        
         
 # just convert the model to single output!            
+class singleOutputSigmoid(torch.nn.Module):
+    def __init__(self, model):
+        super(singleOutputSigmoid, self).__init__()
+        self.model = model
+
+
+    def forward(self, inputs):
+        return torch.sigmoid(self.model(inputs)[:,0].to(torch.float64))
+        
+            
 class singleOutput(torch.nn.Module):
     def __init__(self, model):
         super(singleOutput, self).__init__()
@@ -30,8 +40,7 @@ class singleOutput(torch.nn.Module):
 
 
     def forward(self, inputs):
-        return torch.sigmoid(self.model(inputs)[:,0].to(torch.float64))        
-            
+        return self.model(inputs)[:,0].to(torch.float64)             
     
 # following helper functions help us to convert complex models to sequential models for easier breakdown at any layer
 
