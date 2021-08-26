@@ -146,10 +146,10 @@ for layerNo in inspectionLayers:
     dataSet = OAI(dataFolder, transform=transform)
     trainSet, testSet, validSet = trainTestValid( dataSet, .7, .2, .1, seed=2021)
     
-    conceptTrainLoader = torch.utils.data.DataLoader(trainSet, batch_size=16,
+    conceptTrainLoader = torch.utils.data.DataLoader(cacheDataset(trainSet), batch_size=16,
                                              shuffle=False, num_workers=0)
     
-    conceptValidLoader = torch.utils.data.DataLoader(testSet, batch_size=16,
+    conceptValidLoader = torch.utils.data.DataLoader(cacheDataset(testSet), batch_size=16,
                                              shuffle=False, num_workers=0)
     # this is required to get activation of the reference model
     #evalSet = torchvision.datasets.ImageFolder(evaluationFolder, loader=plt.imread, transform=transform )
