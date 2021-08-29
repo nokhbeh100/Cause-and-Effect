@@ -30,8 +30,8 @@ concept_no = 154
 # folder of evaluation points (distribution sample set)
 evaluationFolder = './datasets/places365/'
 
-N_EPOCHS_TRAIN = N_EPOCHS = 50
+N_EPOCHS_TRAIN = N_EPOCHS = 500
 # number of iternations that cost doesn't go down before stopping training
-smart_stop = 5
+smart_stop = 50
 # number of channels of input images
 d = 3 

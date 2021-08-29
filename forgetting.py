@@ -160,8 +160,8 @@ for layerNo in inspectionLayers:
 
     if TRAIN_CONCEPT:
         
-        #optimizer = optim.SGD(conceptModel.parameters(), lr=0.001, momentum=0.9)
-        optimizer = optim.Adam(conceptModel.parameters())
+        optimizer = optim.SGD(conceptModel.parameters(), lr=0.001)
+        #optimizer = optim.Adam(conceptModel.parameters())
                 
         #train to retrieve information
         print(f'training for the layerNo = {layerNo}')
