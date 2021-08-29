@@ -8,7 +8,7 @@ logFilePath = logFilePath.replace(':','_').replace(' ','.')
 # set to save cocnept model
 savemodels = ''
 
-inspectionLayers = [2] # must be changed to 4 for BRODEN training
+inspectionLayers = [2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20] # must be changed to 4 for BRODEN training
 
 TRAIN_MODEL = False
 TRAIN_CONCEPT = True
