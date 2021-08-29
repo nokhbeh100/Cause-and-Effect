@@ -115,7 +115,7 @@ for layerNo in inspectionLayers:
         
     if len(list(layers[-layerNo+1].parameters())) == 0:
         print('WARNING: next layer is nontrainable (maybe activation/dropout/flatten)')
-        #continue
+        continue
     
     # reset the network
     motherNetBase.load_state_dict(state_dict)
