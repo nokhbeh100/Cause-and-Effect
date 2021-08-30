@@ -74,7 +74,7 @@ referenceModel = nn.Sequential( *getModules(referenceModelBase.model) )
 
 
 #motherNetBase = torchvision.models.__dict__['resnet18'](num_classes=365)
-referenceModelBase = singleOutput(torchvision.models.resnet18(pretrained=True))
+motherNetBase = singleOutput(torchvision.models.resnet18(pretrained=True))
 #motherNetBase = singleOutput(torchvision.models.vgg16(pretrained=False))
 motherNet = nn.Sequential( *getModules(motherNetBase.model) )
 
