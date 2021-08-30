@@ -65,14 +65,16 @@ validLoader = torch.utils.data.DataLoader(validSet, batch_size=16,
 #%%
 
 # both models must be converted to sequential models for better spliting points
-referenceModelBase = torchvision.models.__dict__['resnet18'](num_classes=365)
+#referenceModelBase = torchvision.models.__dict__['resnet18'](num_classes=365)
+referenceModelBase = singleOutput(torchvision.models.resnet18(pretrained=True))
 #referenceModelBase = singleOutput(torchvision.models.vgg16(pretrained=True))
 # consider the fact that the model is coppied to local machine
 torch.save(referenceModelBase.state_dict(), motherName)
 referenceModel = nn.Sequential( *getModules(referenceModelBase.model) )
 
 
-motherNetBase = torchvision.models.__dict__['resnet18'](num_classes=365)
+#motherNetBase = torchvision.models.__dict__['resnet18'](num_classes=365)
+referenceModelBase = singleOutput(torchvision.models.resnet18(pretrained=True))
 #motherNetBase = singleOutput(torchvision.models.vgg16(pretrained=False))
 motherNet = nn.Sequential( *getModules(motherNetBase.model) )
 
