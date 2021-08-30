@@ -43,14 +43,14 @@ class OAI(Dataset):
 
 		cacheLoc = os.path.join(self.images_dir, f"{record['barcdbu'][3:]}-{side}.npy")
 		image = np.load(cacheLoc)
-		
+
 		#if randint(0, 1):
 			#image = np.fliplr(image)
 		#image = image[128:512-128, 128:]
 
 		out = record[self.output_cols].to_numpy()
 
-		if self.transform:			
+		if self.transform:
 			return self.transform(image.astype(np.float32)), out[0]
 		else:
 			return image.astype(np.float32), out[0]
@@ -63,7 +63,7 @@ class OAI(Dataset):
 #for i, c in ds:
 	#plt.subplot(1,2,1)
 	#plt.imshow(i)
-	#plt.subplot(1,2,2)	
+	#plt.subplot(1,2,2)
 	#plt.hist(i.reshape(-1), bins=20)
 	#plt.colorbar()
 	#plt.show()
