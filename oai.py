@@ -15,10 +15,13 @@ def mapTime(x):
 class OAI(Dataset):
 	"""OAI interface."""
 
-	def __init__(self, root_dir, transform=None, output_cols = ['xrosfm']):
+	def __init__(self, root_dir, transform=None, output_cols=None):
 		self.root_dir = root_dir
 		self.images_dir = os.path.join(root_dir,'images')
 		kxr = pd.read_csv(os.path.join(root_dir,'kxrsq01.txt'), sep='\t', header=0, skiprows=[1])
+		if (output_cols is None):
+			output_cols = ['xrkl']
+		
 
 		cols = ['src_subject_id', 'barcdbu', 'side', 'xrosfm'] + output_cols
 
