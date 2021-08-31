@@ -83,19 +83,7 @@ state_dict = torch.load(motherName)
 
 
 
-for col in CONCEPTS_BALANCED:
-    dataSet = OAI(dataFolder, transform=transform, output_cols=[col])
-    trainSet, testSet, validSet = trainTestValid( dataSet, .7, .2, .1, seed=2021)
-    
-    trainLoader = torch.utils.data.DataLoader(trainSet, batch_size=16,
-                                             shuffle=False, num_workers=2)
-    
-    testLoader = torch.utils.data.DataLoader(testSet, batch_size=16,
-                                             shuffle=False, num_workers=2)
-    
-    validLoader = torch.utils.data.DataLoader(validSet, batch_size=16,
-                                             shuffle=False, num_workers=2)
-    
+for col in CONCEPTS_BALANCED:    
     referenceModelBase.load_state_dict(state_dict)
     referenceModel = nn.Sequential( *getModules(referenceModelBase) )
     
@@ -152,7 +140,7 @@ for col in CONCEPTS_BALANCED:
              batchToSample])
     
     
-        dataSet = OAI(dataFolder, transform=transform)
+        dataSet = OAI(dataFolder, transform=transform, output_cols=[col])
         trainSet, testSet, validSet = trainTestValid( dataSet, .7, .2, .1, seed=2021)
     
         conceptTrainLoader = torch.utils.data.DataLoader(cacheDataset(trainSet), batch_size=16,
