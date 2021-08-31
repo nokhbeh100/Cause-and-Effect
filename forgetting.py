@@ -222,4 +222,4 @@ for col in CONCEPTS_BALANCED:
     print("conceptValidLayersAcc=", conceptValidLayersAcc)
     #plt.plot(conceptValidLayersAcc)
     
-    logFile.close()
+logFile.close()
