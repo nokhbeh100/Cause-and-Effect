@@ -143,7 +143,7 @@ for col in CONCEPTS_BALANCED:
         dataSet = OAI(dataFolder, transform=transform, output_cols=[col])
         trainSet, testSet, validSet = trainTestValid( dataSet, .7, .2, .1, seed=2021)
     
-        conceptTrainLoader = torch.utils.data.DataLoader(cacheDataset(trainSet), batch_size=16,
+        conceptTrainLoader = torch.utils.data.DataLoader(hardNegDataset(cacheDataset(trainSet), 5000), batch_size=16,
                                                  shuffle=False, num_workers=0)
     
         conceptValidLoader = torch.utils.data.DataLoader(cacheDataset(testSet), batch_size=16,
@@ -163,7 +163,7 @@ for col in CONCEPTS_BALANCED:
             #train to retrieve information
             print(f'training for the layerNo = {layerNo}')
             logFile.write(f"conceptModel:{conceptModel.__class__.__name__}, layerNo:{layerNo}, optimizer: {optimizer.__class__.__name__}, N_EPOCHS:{N_EPOCHS}, smart_stop:{smart_stop}\n")
-            trainForEpoches(conceptModel, conceptTrainLoader, conceptValidLoader, optimizer, criterion, N_EPOCHS = N_EPOCHS, smart_stop=smart_stop, resultFile=logFile, hardNeg=False)
+            trainForEpoches(conceptModel, conceptTrainLoader, conceptValidLoader, optimizer, criterion, N_EPOCHS = N_EPOCHS, smart_stop=smart_stop, resultFile=logFile, hardNeg=True)
     
             if savemodels:
                 torch.save(conceptModel.state_dict(), savemodels+f'concept-{conceptModel.__class__.__name__}-layer{layerNo}.pt')
