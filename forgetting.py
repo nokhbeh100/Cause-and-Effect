@@ -74,6 +74,8 @@ if CUDA:
 
 
 criterion = nn.MSELoss()
+hardNegCriterion = nn.MSELoss(reduction='none')
+
 
 
 # if model is pretrained
@@ -163,7 +165,7 @@ for col in CONCEPTS_BALANCED:
             #train to retrieve information
             print(f'training for the layerNo = {layerNo}')
             logFile.write(f"conceptModel:{conceptModel.__class__.__name__}, layerNo:{layerNo}, optimizer: {optimizer.__class__.__name__}, N_EPOCHS:{N_EPOCHS}, smart_stop:{smart_stop}\n")
-            trainForEpoches(conceptModel, conceptTrainLoader, conceptValidLoader, optimizer, criterion, N_EPOCHS = N_EPOCHS, smart_stop=smart_stop, resultFile=logFile, hardNeg=True)
+            trainForEpoches(conceptModel, conceptTrainLoader, conceptValidLoader, optimizer, criterion, N_EPOCHS = N_EPOCHS, smart_stop=smart_stop, resultFile=logFile, hardNegCriterion=hardNegCriterion)
     
             if savemodels:
                 torch.save(conceptModel.state_dict(), savemodels+f'concept-{conceptModel.__class__.__name__}-layer{layerNo}.pt')
