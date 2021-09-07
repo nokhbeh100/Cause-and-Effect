@@ -6,6 +6,7 @@ import os
 import numpy as np
 from matplotlib import pyplot as plt
 from random import randint
+import oaiConfig
 
 
 def mapTime(x):
@@ -23,7 +24,7 @@ class OAI(Dataset):
 			output_cols = ['xrkl']
 		
 
-		cols = ['src_subject_id', 'barcdbu', 'side', 'xrosfm'] + output_cols
+		cols = ['src_subject_id', 'barcdbu', 'side'] + oaiConfig.CONCEPTS_BALANCED + output_cols
 
 		kxr = kxr[cols]
 		kxr.dropna(inplace=True)

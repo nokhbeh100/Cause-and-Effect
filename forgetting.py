@@ -74,7 +74,7 @@ if CUDA:
 
 
 criterion = nn.MSELoss()
-hardNegCriterion = nn.MSELoss(reduction='none')
+hardNegCriterion = None;nn.MSELoss(reduction='none')
 
 
 
@@ -145,8 +145,8 @@ for col in CONCEPTS_BALANCED:
         dataSet = OAI(dataFolder, transform=transform, output_cols=[col])
         trainSet, testSet, validSet = trainTestValid( dataSet, .7, .2, .1, seed=2021)
     
-        conceptTrainLoader = torch.utils.data.DataLoader(hardNegDataset(cacheDataset(trainSet), 5000), batch_size=16,
-                                                 shuffle=False, num_workers=0)
+        conceptTrainLoader = torch.utils.data.DataLoader(cacheDataset(trainSet), batch_size=16,
+                                                 shuffle=True, num_workers=0)
     
         conceptValidLoader = torch.utils.data.DataLoader(cacheDataset(testSet), batch_size=16,
                                                  shuffle=False, num_workers=0)
