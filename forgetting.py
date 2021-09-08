@@ -85,7 +85,7 @@ state_dict = torch.load(motherName)
 
 
 
-for col in CONCEPTS_BALANCED:    
+for col in CONCEPTS_BALANCED[7:]:    
     referenceModelBase.load_state_dict(state_dict)
     referenceModel = nn.Sequential( *getModules(referenceModelBase) )
     
